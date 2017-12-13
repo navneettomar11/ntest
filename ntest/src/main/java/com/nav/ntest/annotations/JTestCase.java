@@ -1,4 +1,4 @@
-package com.nav.ntest.config;
+package com.nav.ntest.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

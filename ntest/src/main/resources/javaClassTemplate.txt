@@ -1,0 +1,10 @@
+{{packageName}};
+
+import junit.framework.Test;
+{{imports}}
+
+public class {{className}}Test {
+
+    {{testMethods}}
+
+}

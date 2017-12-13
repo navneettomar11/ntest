@@ -1,8 +1,8 @@
-package com.nav.ntest_examples.examples;
+package com.nav.ntest.examples;
 
-import com.nav.ntest.config.AssertConditionType;
-import com.nav.ntest.config.JTestCase;
-import com.nav.ntest.config.JTestCases;
+import com.nav.ntest.annotations.AssertConditionType;
+import com.nav.ntest.annotations.JTestCase;
+import com.nav.ntest.annotations.JTestCases;
 
 public class Bodmas {
 
@@ -29,16 +29,10 @@ public class Bodmas {
         if(expression == null){
             return -1;
         }
-        System.out.println("Expression : "+expression);
         expression = solveBracket(expression);
         java.util.List splitExprList = splitExpressionIntoList(expression);
         Integer result = calauateExpression(splitExprList);
-        System.out.println("Expression Result: "+result);
         return result;
-    }
-
-    public Bodmas(){
-
     }
 
     private String solveBracket(String expression) {

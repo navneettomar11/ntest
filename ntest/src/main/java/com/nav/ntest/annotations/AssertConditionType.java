@@ -1,4 +1,4 @@
-package com.nav.ntest.config;
+package com.nav.ntest.annotations;
 
 public enum AssertConditionType {
     ASSERT_TRUE,

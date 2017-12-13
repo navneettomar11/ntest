@@ -1,6 +1,6 @@
-package com.nav.ntest_examples.examples;
+package com.nav.ntest.examples;
 
-import com.nav.ntest.config.*;
+import com.nav.ntest.annotations.*;
 
 public class MathUtils {
 

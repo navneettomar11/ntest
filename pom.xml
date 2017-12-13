@@ -4,10 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.nav.ntest</groupId>
-    <artifactId>nv-jtest</artifactId>
+    <artifactId>nav-ntest</artifactId>
     <version>0.1.0</version>
     <packaging>pom</packaging>
 
+    <scm>
+        <url>https://github.com/navneettomar11/ntest</url>
+        <connection>scm:git:git@github.com:navneettomar11/ntest.git</connection>
+        <developerConnection>scm:git:git@github.com:navneettomar11/ntest.git</developerConnection>
+    </scm>
     <modules>
         <module>ntest</module>
         <module>ntest-examples</module>

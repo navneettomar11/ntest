@@ -1,10 +1,10 @@
-package com.nav.ntest;
+package com.nav.ntest.generator;
 
 
 import com.google.googlejavaformat.java.FormatterException;
-import com.nav.ntest.config.AssertConditionType;
-import com.nav.ntest.config.JTestCase;
-import com.nav.ntest.config.JTestCases;
+import com.nav.ntest.annotations.AssertConditionType;
+import com.nav.ntest.annotations.JTestCase;
+import com.nav.ntest.annotations.JTestCases;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.googlejavaformat.java.Formatter;
@@ -21,27 +21,70 @@ public class JUnitTestCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JUnitTestCreator.class);
     private static final String NEW_LINE = "\r\n";
+    private static final String ASSERT_STATIC_IMPORT = "import static org.junit.Assert";
+    private static final String ALL_ASSERT_STATIC_IMPORT = "import static org.junit.Assert.*";
 
     private JUnitTestCreator(){
-        throw new NullPointerException();
+        throw new AssertionError();
     }
 
     /**
-     * Create JUnit Test Case
+     * Generating JUnit Test class for given package and create Test class in given test directory path.
      * @param packageName
-     * @throws IOException
+     * @param testDirPath Give absolute test diretory path
      */
-    public static void createJUnitTestClass2(String packageName, String testDirPath) throws IOException {
-        LOGGER.debug("Creating JUnit Test Classes for : {0}",packageName);
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        String path = packageName.replace('.','/');
-        Enumeration resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList();
+    public static void generateJUNitTestClass(String packageName, String testDirPath) {
+        LOGGER.info("Generating JUnit class Start...");
+        try{
+            java.util.Collection<Class> classes = getAllJavaFileForGivenPackage(packageName);
+            if(classes.isEmpty()){
+                LOGGER.error("No Java Classes Found");
+                return;
+            }
+            for(Class c : classes){
+                String testFileContent = generateJUnitTestFileContent(c);
+                LOGGER.info(testFileContent);
+            }
+        }catch(IOException ioex){
+            LOGGER.error("Error occurred", ioex);
+        }
+        LOGGER.info("Generating JUNit class End...");
+    }
+
+    /**
+     * Generating content of Unit Test class for given class
+     * @param c
+     * @return
+     */
+    private static String generateJUnitTestFileContent(Class c){
+        LOGGER.info("Generating Test class content start...");
+        StringBuilder testFileContent = new StringBuilder(getTestClassFileFromTemplate(c.getPackage().getName(), c.getSimpleName()));
+        Method[] methods = c.getMethods();
+        Map<String,Integer> methodList = new HashMap<>();
+        for(Method method: methods){
+            JTestCases jTestCases = method.getAnnotation(JTestCases.class);
+            if(jTestCases != null){
+
+            }
+        }
+        LOGGER.info("Generating Test class content end...");
+        return testFileContent.toString();
+    }
+    /**
+     * Getting all java class from given packge
+     * @param packageName
+     * @return
+     */
+    private static java.util.Collection<Class> getAllJavaFileForGivenPackage(String packageName) throws IOException{
+        LOGGER.info("Getting all java files from given package start...");
+        java.util.Collection<Class> classes = new ArrayList<>();
+        String packageDirectory = packageName.replace('.','/');
+        Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(packageDirectory);
+        Collection<File> dirs = new ArrayList();
         while (resources.hasMoreElements()) {
             URL resource = (URL) resources.nextElement();
             dirs.add(new File(resource.getFile()));
         }
-        ArrayList<Class> classes = new ArrayList();
         for (File directory : dirs) {
             try{
                 classes.addAll(findClasses(directory, packageName));
@@ -49,6 +92,36 @@ public class JUnitTestCreator {
                 LOGGER.error("Class Not found :", clnex);
             }
         }
+        LOGGER.info("Getting all java files from given package end...");
+        return  classes;
+    }
+
+    private static String getTestClassFileFromTemplate(String packageName, String className){
+        //if(TEMPLATE_FILE_CONTENT == null){
+            StringBuilder temp = new StringBuilder();
+            InputStream templateInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("javaClassTemplate.txt");
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(templateInputStream))){
+                String line = null;
+                while( (line = reader.readLine())!=null){
+                 temp.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //TEMPLATE_FILE_CONTENT = temp.toString();
+        //}
+        String templateContent = temp.toString();
+        templateContent = templateContent.replaceAll("\\{\\{packageName\\}\\}", packageName);
+        templateContent = templateContent.replaceAll("\\{\\{className\\}\\}", className);
+        return templateContent;
+    }
+    /**
+     * Create JUnit Test Case
+     * @param packageName
+     * @throws IOException
+     */
+    public static void createJUnitTestClass2(String packageName, String testDirPath) throws IOException {
+        ArrayList<Class> classes = new ArrayList();
         for(Class c : classes){
             StringBuilder testFileContent = new StringBuilder();
             testFileContent.append("package "+c.getPackage().getName()+";"+NEW_LINE);
