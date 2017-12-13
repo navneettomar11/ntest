@@ -1,0 +1,9 @@
+.idea/
+ntest/.idea/
+ntest/target/
+ntest-examples/target/
+ntest-examples/.idea/
+ntest-examples.iml
+ntest-examples/*.iml
+ntest/*.iml
+*.iml
