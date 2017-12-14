@@ -31,8 +31,7 @@ public class Bodmas {
         }
         expression = solveBracket(expression);
         java.util.List splitExprList = splitExpressionIntoList(expression);
-        Integer result = calauateExpression(splitExprList);
-        return result;
+        return calauateExpression(splitExprList);
     }
 
     private String solveBracket(String expression) {
@@ -54,7 +53,8 @@ public class Bodmas {
         if(splitExprList.size() > 1) {
             int subtractionIndex = splitExprList.indexOf(SUBTRACTION);
             int additionIndex = splitExprList.indexOf(ADDITION);
-            Double subtractionOperand = 0d, additionOperand = 0d;
+            Double subtractionOperand = 0d;
+            Double additionOperand = 0d;
             if(subtractionIndex > -1){
                 subtractionOperand = Double.parseDouble(splitExprList.get(subtractionIndex - 1));
             }
@@ -105,20 +105,19 @@ public class Bodmas {
     }
 
     private java.util.List<String> splitExpressionIntoList(String expression){
-        String tmp="";
+        StringBuilder tmp= new StringBuilder();
         java.util.List<String> splitExpressionList = new java.util.ArrayList();
         for(char z : expression.toCharArray()){
             if(Character.isDigit(z)){
-                tmp+=z;
+                tmp.append(z);
             }else {
-                splitExpressionList.add(tmp);
+                splitExpressionList.add(tmp.toString());
                 splitExpressionList.add(Character.toString(z));
-                tmp = "";
-
+                tmp.delete(0, tmp.length());
             }
         }
-        if(!"".equalsIgnoreCase(tmp)) {
-            splitExpressionList.add(tmp);
+        if(tmp.length() > 0) {
+            splitExpressionList.add(tmp.toString());
         }
         return splitExpressionList;
     }

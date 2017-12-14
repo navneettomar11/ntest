@@ -58,17 +58,47 @@ public class JUnitTestCreator {
      */
     private static String generateJUnitTestFileContent(Class c){
         LOGGER.info("Generating Test class content start...");
-        StringBuilder testFileContent = new StringBuilder(getTestClassFileFromTemplate(c.getPackage().getName(), c.getSimpleName()));
         Method[] methods = c.getMethods();
-        Map<String,Integer> methodList = new HashMap<>();
+        java.util.List<TestMethod> testMethods = new java.util.ArrayList<>();
         for(Method method: methods){
             JTestCases jTestCases = method.getAnnotation(JTestCases.class);
-            if(jTestCases != null){
-
+            if(jTestCases == null || jTestCases.cases().length == 0){
+                continue;
             }
+            TestMethod testMethod = new TestMethod();
+            String methodName = method.getName();
+            testMethod.setMethodName(method.getName());
+            for(JTestCase testCase : jTestCases.cases()){
+                String expected = wrapToObject(method.getReturnType(),testCase.expected());
+                testMethod.getTestCases().put(expected, getTestMethodArugments(testCase, method));
+            }
+            testMethods.add(testMethod);
+            LOGGER.info(testMethod.toString());
+        }
+        if(!testMethods.isEmpty()){
+            StringBuilder testFileContent = new StringBuilder(getTestClassFileFromTemplate(c.getPackage().getName(), c.getSimpleName()));
+            return testFileContent.toString();
         }
         LOGGER.info("Generating Test class content end...");
-        return testFileContent.toString();
+        return null;
+
+    }
+
+    private static java.util.Collection<String> getTestMethodArugments(JTestCase testCase, Method method){
+        LOGGER.info("Generate Test Method Arguments start...");
+        java.util.List<String> argumentList = new java.util.ArrayList<>();
+        String[] arguments = testCase.arguments();
+        Class[] paramTypesClasses =method.getParameterTypes();
+        if(arguments==null || arguments.length == 0){
+            argumentList.add("null");
+        }else {
+            int paramTypeClassIndex = 0;
+            for(String args : arguments){
+                argumentList.add(wrapToObject(paramTypesClasses[paramTypeClassIndex++],args));
+            }
+        }
+        LOGGER.info("Generate Test Method Arguments end...");
+        return argumentList;
     }
     /**
      * Getting all java class from given packge
@@ -97,19 +127,16 @@ public class JUnitTestCreator {
     }
 
     private static String getTestClassFileFromTemplate(String packageName, String className){
-        //if(TEMPLATE_FILE_CONTENT == null){
-            StringBuilder temp = new StringBuilder();
-            InputStream templateInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("javaClassTemplate.txt");
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(templateInputStream))){
-                String line = null;
-                while( (line = reader.readLine())!=null){
-                 temp.append(line);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        StringBuilder temp = new StringBuilder();
+        InputStream templateInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("javaClassTemplate.txt");
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(templateInputStream))){
+            String line = null;
+            while( (line = reader.readLine())!=null){
+             temp.append(line);
             }
-            //TEMPLATE_FILE_CONTENT = temp.toString();
-        //}
+        } catch (IOException e) {
+            LOGGER.error("Reading Template Exception : ", e);
+        }
         String templateContent = temp.toString();
         templateContent = templateContent.replaceAll("\\{\\{packageName\\}\\}", packageName);
         templateContent = templateContent.replaceAll("\\{\\{className\\}\\}", className);
@@ -137,7 +164,6 @@ public class JUnitTestCreator {
                }
            }
             testFileContent.append("}");
-            System.out.println(testFileContent);
             String formattedSource = null;
             try {
                 formattedSource = new Formatter().formatSource(testFileContent.toString());

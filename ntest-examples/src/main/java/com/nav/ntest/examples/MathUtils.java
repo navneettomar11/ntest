@@ -4,9 +4,6 @@ import com.nav.ntest.annotations.*;
 
 public class MathUtils {
 
-    public MathUtils(){
-
-    }
     @JTestCases(cases = {@JTestCase(arguments = {"10","20"},assertType = AssertConditionType.ASSERT_EQUALS, expected = "30")})
     public Integer add(Integer a, Integer b){
         return a+b;

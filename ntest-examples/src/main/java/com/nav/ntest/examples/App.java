@@ -7,6 +7,6 @@ import java.io.IOException;
 public class App 
 {
     public static void main( String[] args ) throws IOException {
-        JUnitTestCreator.generateJUNitTestClass("com.nav.ntest_examples.examples","/Users/navneet/Projects/ntest-project/ntest-examples/src/test/java/");
+        JUnitTestCreator.generateJUNitTestClass("com.nav.ntest.examples","/Users/navneet/Projects/ntest-project/ntest-examples/src/test/java/");
     }
 }
