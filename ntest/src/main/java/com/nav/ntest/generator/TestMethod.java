@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.nav.ntest.generator.JUnitTestCreatorConstant.NEWLINE;
+
 public class TestMethod {
 
     private String methodName;
@@ -43,8 +45,8 @@ public class TestMethod {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format("public void %s() {",methodName));
+        StringBuilder builder = new StringBuilder("@Test"+ NEWLINE);
+        builder.append(String.format("public void %sTest() {",methodName));
 
         builder.append("}");
         return builder.toString();
